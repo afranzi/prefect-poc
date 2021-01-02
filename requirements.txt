@@ -1,0 +1,2 @@
+prefect==0.14.1
+prefect[dev, templates, viz, aws, kubernetes]==0.14.1

@@ -1,0 +1,54 @@
+.DS_Store
+__pycache__/*
+__pycache__
+.pyc
+
+.idea
+.vscode
+
+# docker aws credentials
+# .env
+
+### Vim ###
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+
+### SublimeText ###
+# cache files for sublime text
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+
+review
+
+# workspace files are user-specific
+*.sublime-workspace
+
+# project files should be checked into the repository, unless a significant
+# proportion of contributors will probably not be using SublimeText
+# *.sublime-project
+
+# sftp configuration file
+sftp-config.json
+
+# Python
+__pycache__
+temp.json
+src/dags/salesforce/temp.json
+.coverage
+.eggs
+*.egg-info
+
+.terraform
+*.swp
+*.backup
+
+
+#jupyter
+.ipynb_checkpoints
+.ipynb_checkpoints/*
+review/docker-airflow
