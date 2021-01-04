@@ -8,10 +8,13 @@ from prefect import task, Task, Parameter
 from prefect.engine import signals, state
 from prefect.engine.state import State
 from prefect.schedules import IntervalSchedule
+from prefect.tasks.aws import AWSSecretsManager
 from prefect.utilities.notifications import callback_factory
 from prefect.executors import DaskExecutor, LocalDaskExecutor
 from prefect.tasks.secrets import SecretBase, PrefectSecret
 from prefect.client.secrets import Secret
+from prefect.utilities.debug import is_serializable
+
 
 
 @task
@@ -24,6 +27,12 @@ def say_hello(person: str) -> None:
 def say_bye(person: str) -> None:
     logger = prefect.context.get('logger')
     logger.info(f'Bye: {person}')
+
+
+@task
+def print_secret(secret_content: dict) -> None:
+    logger = prefect.context.get('logger')
+    logger.info(f'Secret: {secret_content}')
 
 
 class RandomTask(Task):
@@ -68,15 +77,29 @@ with Flow(
     hello_task = say_hello(person=name)
 
     random = RandomTask(
-        name='Random', max_retries=2,
-        retry_delay=timedelta(seconds=5),
+        name='Random', max_retries=3,
+        retry_delay=timedelta(seconds=1),
     )
     random_1 = random(threshold=threshold)
-    random_2 = random(threshold=random_1)
-    random_3 = random(threshold=random_2)
+    random_2 = random(threshold=threshold)
+    random_3 = random(threshold=threshold)
     random_x = random.map(threshold=[random_1, random_2, random_3])
 
+    secret_task = AWSSecretsManager(
+        secret='prefect/dummy',
+        boto_kwargs={
+            'use_session': True,
+            'profile_name': 'MyProfileName',
+            'region_name': 'us-east-1'
+        }
+    )
+
+    spy_task = print_secret(secret_task)
     bye_task = say_bye(person=name)
+
+    # Task Lineage
+    hello_task.set_upstream(spy_task)
+    random_1.set_upstream(hello_task)
     bye_task.set_upstream(random_x)
 
 for t in flow.tasks:
@@ -84,6 +107,8 @@ for t in flow.tasks:
         t.state_handlers.append(log_on_retry)
 
 flow.set_reference_tasks([random_x])
+
+is_serializable(flow)
 flow.register(
     project_name='Hello, World!',
     idempotency_key=flow.serialized_hash(),

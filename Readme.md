@@ -76,6 +76,9 @@ prefect create project 'Hello, World!'
 Use DaskExecutor with [dask_kubernetes.KubeCluster](https://kubernetes.dask.org/) as cluster class.
 Setup the [Helm Dask](https://helm.dask.org/) to be able to have Dask in K8s.
 
+- [Static Dask Cluster on Kubernetes](https://docs.prefect.io/orchestration/recipes/k8s_dask.html)
+- [Kubernetes Agent](https://docs.prefect.io/orchestration/agents/kubernetes.html#kubernetes-agent)
+
 ## Issues of Interest
 - Kubernetes Cluster AutoScaler can result in failed Flow Runs [#3058](https://github.com/PrefectHQ/prefect/issues/3058)
 ```shell script
